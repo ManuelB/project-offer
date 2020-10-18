@@ -1,0 +1,486 @@
+{
+	"_version": "1.1.0",
+	"sap.app": {
+		"_version": "1.1.0",
+		"id": "incentergy.projectoffer",
+		"type": "application",
+		"title": "{{appTitle}}",
+		"description": "{{appDescription}}",
+		"applicationVersion": {
+			"version": "1.0.0"
+		},
+		"dataSources": {
+			"Data.svc": {
+				"uri": "../../../project-offer-backend/Data.svc?sap-context-token=1",
+				"type": "OData",
+				"settings": {
+					"odataVersion": "2.0"
+				}
+			}
+		}
+	},
+	"sap.ui": {
+		"_version": "1.1.0",
+		"technology": "UI5",
+		"deviceTypes": {
+			"desktop": true,
+			"tablet": true,
+			"phone": true
+		},
+		"supportedThemes": [
+			"sap_fiori_3"
+		]
+	},
+	"sap.ui5": {
+		"_version": "1.1.0",
+		"rootView": {
+			"viewName": "incentergy.projectoffer.view.App",
+			"type": "XML",
+			"async": true
+		},
+		"dependencies": {
+			"minUI5Version": "1.68.1",
+			"libs": {
+				"sap.m": {
+					
+				},
+				"sap.f": {
+					
+				},
+				"sap.uxap": {
+					
+				},
+				"sap.tnt": {
+					
+				},
+				"sap.ui.unified": {
+					
+				},
+				"sap.ui.layout": {
+					
+				}
+			}
+		},
+		"config": {
+			"fullWidth": true
+		},
+		"models": {
+			"i18n": {
+				"type": "sap.ui.model.resource.ResourceModel",
+				"settings": {
+					"bundleName": "incentergy.projectoffer.i18n.i18n"
+				}
+			},
+			"": {
+				"dataSource": "Data.svc",
+				"type": "sap.ui.model.odata.v2.ODataModel",
+				"preload": true,
+				"settings": {
+					"defaultBindingMode": "TwoWay"
+				}
+			}
+		},
+		"routing": {
+			"config": {
+				"routerClass": "sap.f.routing.Router",
+				"viewType": "XML",
+				"viewPath": "incentergy.projectoffer.view",
+				"controlId": "fcl",
+				"transition": "slide",
+				"async": true
+			},
+			"routes": [
+				{
+					"pattern": "projectoffer/:layout:",
+					"name": "master",
+					"navigationItem": {
+						"id": "19a3a082-48f2-46a6-9635-3169d6a6ad4f",
+						"route": "projectoffer",
+						"sort": 150,
+						"topLevelItem": true,
+						"icon": "sap-icon://project-definition-triangle",
+						"text": {
+							"de" : "Projektangebote",
+							"en" : "Project OFfers"
+						}
+					},
+					"target": [
+						"master",
+						"detail"
+					]
+				},
+				{
+					"pattern": "projectoffer/search/:query:",
+					"name": "search",
+					"target": [
+						"master",
+						"detail"
+					]
+				},
+				{
+					"pattern": "projectoffer/{projectoffer}/{layout}",
+					"name": "detail",
+					"target": [
+						"master",
+						"detail"
+					]
+				}
+			],
+			"targets": {
+				"master": {
+					"viewName": "Master",
+					"controlAggregation": "beginColumnPages"
+				},
+				"detail": {
+					"viewName": "Detail",
+					"controlAggregation": "midColumnPages"
+				}
+			}
+		}
+	},
+	"incentergy.base.opensearch": {
+		"url": "../../../project-offer-backend/opensearch/search?q="
+	},
+	"incentergy.base.vega": [
+		{
+			"rows": 3,
+			"columns": 2,
+			"header": {
+				"title": "Project offers",
+				"subTitle": "by date",
+				"status": {
+					"text": "open"
+				},
+				"icon": {
+					"src": "sap-icon://project-definition-triangle"
+				}
+			},
+			"content": {
+			  "$schema": "https://vega.github.io/schema/vega/v5.json",
+			  "background": "white",
+			  "padding": 5,
+			  "height": 200,
+			  "width": 600,
+			  "data": [
+			    {
+			      "name": "source_0",
+			      "url": "../../../project-offer-backend/Data.svc/ProjectOffers?$select=Id,OriginalPublicationDate"
+			    },
+			    {
+			      "name": "data_0",
+			      "source": "source_0",
+			      "transform": [
+			        {"type": "flatten", "fields": ["d.results"], "as": ["project"]},
+					{
+			          "type": "formula",
+			          "expr": "timeParse(datum[\"project\"] && datum[\"project\"][\"OriginalPublicationDate\"],'/Date(%Q)/')",
+			          "as": "project.OriginalPublicationDate"
+			        },
+			        {
+			          "field": "project\\.OriginalPublicationDate",
+			          "type": "timeunit",
+			          "units": ["year", "month", "date"],
+			          "as": [
+			            "yearmonthdate_project.OriginalPublicationDate",
+			            "yearmonthdate_project.OriginalPublicationDate_end"
+			          ]
+			        },
+			        {
+			          "type": "aggregate",
+			          "groupby": [
+			            "yearmonthdate_project\\.OriginalPublicationDate",
+			            "yearmonthdate_project\\.OriginalPublicationDate_end"
+			          ],
+			          "ops": ["count"],
+			          "fields": [null],
+			          "as": ["__count"]
+			        },
+			        {
+			          "type": "filter",
+			          "expr": "(isDate(datum[\"yearmonthdate_project.OriginalPublicationDate\"]) || (isValid(datum[\"yearmonthdate_project.OriginalPublicationDate\"]) && isFinite(+datum[\"yearmonthdate_project.OriginalPublicationDate\"])))"
+			        }
+			      ]
+			    }
+			  ],
+			  "signals": [{"name": "childWidth", "value": 580}],
+			  "layout": {"padding": 20, "bounds": "full", "align": "each"},
+			  "marks": [
+			    {
+			      "type": "group",
+			      "name": "concat_0_group",
+			      "title": {"text": "Job offers per day", "frame": "group"},
+			      "style": "cell",
+			      "encode": {
+			        "update": {
+			          "width": {"signal": "childWidth"},
+			          "height": {"signal": "height"}
+			        }
+			      },
+			      "marks": [
+			        {
+			          "name": "concat_0_marks",
+			          "type": "rect",
+			          "style": ["bar"],
+			          "from": {"data": "data_0"},
+			          "encode": {
+			            "update": {
+			              "fill": {"value": "#4c78a8"},
+			              "tooltip": {"signal": "format(datum[\"__count\"], \"\")"},
+			              "ariaRoleDescription": {"value": "bar"},
+			              "description": {
+			                "signal": "\"project.OriginalPublicationDate (year-month-date): \" + (utcFormat(datum[\"yearmonthdate_project.OriginalPublicationDate\"], timeUnitSpecifier([\"year\",\"month\",\"date\"], {\"year-month\":\"%b %Y \",\"year-month-date\":\"%b %d, %Y \"}))) + \"; Count of Records: \" + (format(datum[\"__count\"], \"\"))"
+			              },
+			              "x2": [
+			                {
+			                  "test": "!isValid(datum[\"yearmonthdate_project.OriginalPublicationDate\"]) || !isFinite(+datum[\"yearmonthdate_project.OriginalPublicationDate\"])",
+			                  "value": 0
+			                },
+			                {
+			                  "scale": "concat_0_x",
+			                  "field": "yearmonthdate_project\\.OriginalPublicationDate",
+			                  "offset": 1
+			                }
+			              ],
+			              "x": [
+			                {
+			                  "test": "!isValid(datum[\"yearmonthdate_project.OriginalPublicationDate\"]) || !isFinite(+datum[\"yearmonthdate_project.OriginalPublicationDate\"])",
+			                  "value": 0
+			                },
+			                {
+			                  "scale": "concat_0_x",
+			                  "field": "yearmonthdate_project\\.OriginalPublicationDate_end"
+			                }
+			              ],
+			              "y": {"scale": "concat_0_y", "field": "__count"},
+			              "y2": {"scale": "concat_0_y", "value": 0}
+			            }
+			          }
+			        }
+			      ],
+			      "axes": [
+			        {
+			          "scale": "concat_0_x",
+			          "orient": "bottom",
+			          "gridScale": "concat_0_y",
+			          "grid": true,
+			          "tickCount": {"signal": "ceil(childWidth/40)"},
+			          "domain": false,
+			          "labels": false,
+			          "aria": false,
+			          "maxExtent": 0,
+			          "minExtent": 0,
+			          "ticks": false,
+			          "zindex": 0
+			        },
+			        {
+			          "scale": "concat_0_y",
+			          "orient": "left",
+			          "gridScale": "concat_0_x",
+			          "grid": true,
+			          "tickCount": {"signal": "ceil(height/40)"},
+			          "domain": false,
+			          "labels": false,
+			          "aria": false,
+			          "maxExtent": 0,
+			          "minExtent": 0,
+			          "ticks": false,
+			          "zindex": 0
+			        },
+			        {
+			          "scale": "concat_0_x",
+			          "orient": "bottom",
+			          "grid": false,
+			          "title": "project.OriginalPublicationDate (year-month-date)",
+			          "labelAngle": 15,
+			          "format": {
+			            "signal": "timeUnitSpecifier([\"year\",\"month\",\"date\"], {\"year-month\":\"%b %Y \",\"year-month-date\":\"%b %d, %Y \"})"
+			          },
+			          "labelAlign": "left",
+			          "labelBaseline": "top",
+			          "labelFlush": true,
+			          "labelOverlap": true,
+			          "tickCount": {"signal": "ceil(childWidth/40)"},
+			          "zindex": 0
+			        },
+			        {
+			          "scale": "concat_0_y",
+			          "orient": "left",
+			          "grid": false,
+			          "title": "Count of Records",
+			          "labelOverlap": true,
+			          "tickCount": {"signal": "ceil(height/40)"},
+			          "zindex": 0
+			        }
+			      ]
+			    }
+			  ],
+			  "scales": [
+			    {
+			      "name": "concat_0_x",
+			      "type": "utc",
+			      "domain": {
+			        "data": "data_0",
+			        "fields": [
+			          "yearmonthdate_project\\.OriginalPublicationDate",
+			          "yearmonthdate_project\\.OriginalPublicationDate_end"
+			        ]
+			      },
+			      "range": [0, {"signal": "childWidth"}]
+			    },
+			    {
+			      "name": "concat_0_y",
+			      "type": "linear",
+			      "domain": {"data": "data_0", "field": "__count"},
+			      "range": [{"signal": "height"}, 0],
+			      "nice": true,
+			      "zero": true
+			    }
+			  ]
+			}
+		}, {
+			"rows": 3,
+			"columns": 2,
+			"header": {
+				"title": "Project offers",
+				"subTitle": "by skills",
+				"status": {
+					"text": "open"
+				},
+				"icon": {
+					"src": "sap-icon://project-definition-triangle"
+				}
+			},
+			"content": {
+			  "$schema": "https://vega.github.io/schema/vega/v5.json",
+			  "background": "white",
+			  "padding": 5,
+			  "width": 600,
+			  "height": 200,
+			  "title": {"text": "Job offers per skill", "frame": "group"},
+			  "style": "cell",
+			  "data": [
+			    {
+			      "name": "source_0",
+			      "url": "../../../project-offer-backend/Data.svc/ProjectOffers?$expand=Skills&$select=Id,Skills/Name",
+			      "format": {"type": "json"},
+			      "transform": [
+			        {"type": "flatten", "fields": ["d.results"], "as": ["project"]},
+			        {
+			          "type": "flatten",
+			          "fields": ["project.Skills.results"],
+			          "as": ["skills"]
+			        },
+			        {
+			          "type": "formula",
+			          "expr": "datum[\"skills\"] && datum[\"skills\"][\"Name\"]",
+			          "as": "skills.Name"
+			        },
+			        {
+			          "type": "formula",
+			          "expr": "datum[\"project\"] && datum[\"project\"][\"Id\"]",
+			          "as": "project.Id"
+			        },
+			        {
+			          "type": "aggregate",
+			          "groupby": ["skills\\.Name"],
+			          "ops": ["count"],
+			          "fields": [null],
+			          "as": ["__count"]
+			        },
+					{
+						"type": "filter",
+						"expr": "datum[\"__count\"] > 4"
+					},
+					{
+					  "type": "collect",
+					  "sort": {"field": "__count"}
+					},
+					{
+			          "type": "formula",
+			          "expr": "'#/projectoffer/search/Skills_Name=' + datum[\"skills.Name\"]",
+			          "as": "url"
+			        }
+			      ]
+			    }
+			  ],
+			  "marks": [
+			    {
+			      "name": "marks",
+			      "type": "rect",
+			      "style": ["bar"],
+			      "from": {"data": "source_0"},
+			      "encode": {
+			        "update": {
+			          "fill": {"value": "#4c78a8"},
+			          "tooltip": {"signal": "datum[\"skills.Name\"]"},
+			          "href": {
+			            "signal": "isValid(datum[\"url\"]) ? datum[\"url\"] : \"\"+datum[\"url\"]"
+			          },
+			          "ariaRoleDescription": {"value": "bar"},
+			          "description": {
+			            "signal": "\"skills.Name: \" + (isValid(datum[\"skills.Name\"]) ? datum[\"skills.Name\"] : \"\"+datum[\"skills.Name\"]) + \"; Count of Records: \" + (format(datum[\"__count\"], \"\"))"
+			          },
+			          "x": {"scale": "x", "field": "skills\\.Name"},
+			          "width": {"scale": "x", "band": 1},
+			          "y": {"scale": "y", "field": "__count"},
+			          "y2": {"scale": "y", "value": 0}
+			        }
+			      }
+			    }
+			  ],
+			  "scales": [
+			    {
+			      "name": "x",
+			      "type": "band",
+			      "domain": {"data": "source_0", "field": "skills\\.Name"},
+			      "range": [0, {"signal": "width"}],
+			      "paddingInner": 0.1,
+			      "paddingOuter": 0.05
+			    },
+			    {
+			      "name": "y",
+			      "type": "linear",
+			      "domain": {"data": "source_0", "field": "__count"},
+			      "range": [{"signal": "height"}, 0],
+			      "nice": true,
+			      "zero": true
+			    }
+			  ],
+			  "axes": [
+			    {
+			      "scale": "y",
+			      "orient": "left",
+			      "gridScale": "x",
+			      "grid": true,
+			      "tickCount": {"signal": "ceil(height/40)"},
+			      "domain": false,
+			      "labels": false,
+			      "aria": false,
+			      "maxExtent": 0,
+			      "minExtent": 0,
+			      "ticks": false,
+			      "zindex": 0
+			    },
+			    {
+			      "scale": "x",
+			      "orient": "bottom",
+			      "grid": false,
+			      "labelAngle": 60,
+			      "labelAlign": "left",
+			      "labelBaseline": "top",
+			      "zindex": 0
+			    },
+			    {
+			      "scale": "y",
+			      "orient": "left",
+			      "grid": false,
+			      "title": "Count of Records",
+			      "labelOverlap": true,
+			      "tickCount": {"signal": "ceil(height/40)"},
+			      "zindex": 0
+			    }
+			  ]
+			}
+		}
+	]
+}
