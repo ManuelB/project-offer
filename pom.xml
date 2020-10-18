@@ -14,5 +14,6 @@
     <module>frontend</module>
     <module>gulp-scraper</module>
     <module>freelancermap-scraper</module>
+    <module>redsapsolutions-scraper</module>
   </modules>
 </project>
