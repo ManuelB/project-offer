@@ -78,7 +78,7 @@ public class Scraper {
 						
 						builder.add("originalPublicationDate", dateTime.toString());
 	
-						String description = projectRow.select("description").text();
+						String description = projectRow.select(".description").text();
 						builder.add("description", description);
 	
 						List<String> skills = projectRow.select(".categories span a").stream().map(e -> e.text())
