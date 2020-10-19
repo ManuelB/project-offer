@@ -389,7 +389,7 @@
 			        },
 					{
 						"type": "filter",
-						"expr": "datum[\"__count\"] > 4"
+						"expr": "datum[\"__count\"] > 9"
 					},
 					{
 					  "type": "collect",

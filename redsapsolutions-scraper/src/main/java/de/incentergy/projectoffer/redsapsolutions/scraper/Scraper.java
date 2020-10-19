@@ -38,6 +38,8 @@ public class Scraper {
 
 	private static final Pattern SEIT_DIGIT_TAGEN = Pattern.compile("seit (\\d+) Tagen");
 
+	private static final Pattern ETWA_STUNDEN_TAGEN = Pattern.compile("etwa (\\d+) Stunden?");
+
 	@PostConstruct
 	@Schedule(hour = "*")
 	public void scrap() {
@@ -74,12 +76,20 @@ public class Scraper {
 
 						Elements created = projectRow.select(".results-posted-at");
 						// e.g. seit 5 Tagen
-						String relativeDays = created.text().trim();
-						Matcher m = SEIT_DIGIT_TAGEN.matcher(relativeDays);
-						m.find();
-						Long sinceDays = Long.parseLong(m.group(1));
-						LocalDateTime dateTime = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0)
-								.minusDays(sinceDays);
+						String relativeTime = created.text().trim();
+						
+						Long sinceDays = 0l;
+						Matcher m = SEIT_DIGIT_TAGEN.matcher(relativeTime);
+						if(m.find()) {
+							sinceDays = Long.parseLong(m.group(1));
+						}
+						
+						Long hoursDays = 0l;
+						m = ETWA_STUNDEN_TAGEN.matcher(relativeTime);
+						if(m.find()) {
+							hoursDays = Long.parseLong(m.group(1));
+						}
+						LocalDateTime dateTime = LocalDateTime.now().minusDays(sinceDays).minusHours(hoursDays);
 
 						builder.add("originalPublicationDate", dateTime.toString());
 
