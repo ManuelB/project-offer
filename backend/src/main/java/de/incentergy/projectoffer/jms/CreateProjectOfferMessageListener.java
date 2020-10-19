@@ -49,6 +49,12 @@ public class CreateProjectOfferMessageListener implements MessageListener {
 				ProjectOffer projectOffer = jsonb.fromJson(((TextMessage) message).getText(), ProjectOffer.class);
 				log.log(Level.INFO, "Processing project offer event {0}", new Object[] { projectOffer.getId() });
 
+				ProjectOffer alreadyFound = em.find(ProjectOffer.class, projectOffer.getId());
+				// only set publication date once
+				if(alreadyFound != null) {
+					projectOffer.setOriginalPublicationDate(alreadyFound.getOriginalPublicationDate());
+				}
+				
 				em.merge(projectOffer);
 
 			} catch (JMSException e) {
