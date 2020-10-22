@@ -481,6 +481,100 @@
 			    }
 			  ]
 			}
-		}
+		},
+		{
+			"rows": 3,
+			"columns": 2,
+			"header": {
+				"title": "Project offers",
+				"subTitle": "by publisher",
+				"status": {
+					"text": "open"
+				},
+				"icon": {
+					"src": "sap-icon://project-definition-triangle"
+				}
+			},
+			"content": {
+			  "$schema": "https://vega.github.io/schema/vega/v5.json",
+			  "background": "white",
+			  "padding": 5,
+			  "height": 300,
+			  "width": 300,
+ 			  "data": [
+			    {
+			      "name": "source_0",
+			      "url": "../../../project-offer-backend/Data.svc/ProjectOffers?$select=Id,PublishingOrganization",
+			      "transform": [
+			        {"type": "flatten", "fields": ["d.results"], "as": ["project"]},
+			        {
+			          "type": "formula",
+			          "expr": "datum[\"project\"] && datum[\"project\"][\"PublishingOrganization\"]",
+			          "as": "PublishingOrganization"
+			        },
+			        {
+			          "type": "aggregate",
+			          "groupby": ["PublishingOrganization"],
+			          "ops": ["count"],
+			          "fields": [null],
+			          "as": ["__count"]
+			        },
+			        {"type": "pie", "field": "__count"},
+					{
+			          "type": "formula",
+			          "expr": "'#/projectoffer/search/PublishingOrganization=' + datum[\"PublishingOrganization\"]",
+			          "as": "url"
+			        }
+			      ]
+			    }
+			  ],
+			  "scales": [
+			    {
+			      "name": "color",
+			      "type": "ordinal",
+			      "domain": {
+			        "data": "source_0",
+			        "field": "PublishingOrganization"
+			      },
+			      "range": {"scheme": "category20"}
+			    }
+			  ],
+			  "legends": [
+			    {
+			      "stroke": "color",
+			      "title": "Publishing Organization",
+			      "padding": 4,
+			      "encode": {
+			        "symbols": {
+			          "enter": {
+			            "strokeWidth": {"value": 2},
+			            "size": {"value": 50}
+			          }
+			        }
+			      }
+			    }
+			  ],
+			  "marks": [
+			    {
+			      "type": "arc",
+			      "from": {"data": "source_0"},
+			      "encode": {
+			        "enter": {
+			          "fill": {"scale": "color", "field": "PublishingOrganization"},
+			          "tooltip": {"signal": "format(datum[\"__count\"], \"\")"},
+			          "href": {
+			            "signal": "isValid(datum[\"url\"]) ? datum[\"url\"] : \"\"+datum[\"url\"]"
+			          },
+			          "x": {"value": 100},
+			          "y": {"signal": "height / 2"},
+			          "startAngle": {"field": "startAngle"},
+			          "endAngle": {"field": "endAngle"},
+			          "outerRadius": {"value": 100}
+			        }
+			      }
+			    }
+			  ]
+			}
+	     }
 	]
 }
