@@ -24,6 +24,10 @@
 								src="sap-icon://project-definition-triangle"  class="sapUiTinyMarginEnd" />
 							<m:Title text="{Title}" wrapping="true"
 								class="sapUiTinyMarginEnd" />
+							<m:VBox justifyContent="Center" class="sapUiSmallMarginEnd">
+								<m:Label text="{i18n>Url}" />
+								<m:Link href="{Url}" target="_blank" text="{i18n>GoToJobOffer}" />
+							</m:VBox>
 						</m:FlexBox>
 					</m:FlexBox>
 				</snappedHeading>
@@ -52,8 +56,25 @@
 				<f:Avatar src="sap-icon://project-definition-triangle"
 					displaySize="L" class="sapUiTinyMarginEnd" />
 				<m:VBox justifyContent="Center" class="sapUiSmallMarginEnd">
+						<m:Label text="{i18n>OriginalPublicationDate}" />
+						<m:Text
+							text="{path: 'OriginalPublicationDate', type: 'sap.ui.model.odata.type.DateTime', formatOptions: {style: 'short'}}" />
+				</m:VBox>
+				<m:VBox justifyContent="Center" class="sapUiSmallMarginEnd">
+					<m:Label text="{i18n>Location}" />
+					<m:Text text="{Location}" />
+				</m:VBox>
+				<m:VBox justifyContent="Center" class="sapUiSmallMarginEnd">
 					<m:Label text="{i18n>PublishingOrganization}" />
-					<m:Link href="{Url}" text="{PublishingOrganization}" />
+					<m:Text text="{PublishingOrganization}" />
+				</m:VBox>
+				<m:VBox justifyContent="Center" class="sapUiSmallMarginEnd">
+					<m:Label text="{i18n>AgencyOrganization}" />
+					<m:Text text="{AgencyOrganization}" />
+				</m:VBox>
+				<m:VBox justifyContent="Center" class="sapUiSmallMarginEnd">
+					<m:Label text="{i18n>Url}" />
+					<m:Link href="{Url}" text="{i18n>GoToJobOffer}" target="_blank" />
 				</m:VBox>
 			</m:FlexBox>
 		</headerContent>
@@ -63,39 +84,6 @@
 				<subSections>
 					<ObjectPageSubSection title="{i18n>Name}">
 						<blocks>
-							<form:SimpleForm editable="false"
-								layout="ResponsiveGridLayout" title="{i18n>Project}" labelSpanXL="4"
-								labelSpanL="4" labelSpanM="12" labelSpanS="12"
-								adjustLabelSpan="false" emptySpanXL="0" emptySpanL="0"
-								emptySpanM="0" emptySpanS="0" columnsXL="2" columnsL="2"
-								columnsM="2" singleContainerFullSize="false">
-								<form:content>
-									<core:Title text="{i18n>ProjectData}" />
-									<m:Label text="{i18n>Title}" />
-									<m:Text text="{Title}" />
-									<m:Label text="{i18n>OriginalPublicationDate}" />
-									<m:Text
-										text="{path: 'OriginalPublicationDate', type: 'sap.ui.model.odata.type.DateTime', formatOptions: {style: 'short'}}" />
-
-									<core:Title text="{i18n>ContactData}" />
-									<m:Label text="{i18n>ContactFirstname}" />
-									<m:Text text="{ContactFirstname}" />
-									<m:Label text="{i18n>ContactLastname}" />
-									<m:Text text="{ContactLastname}" />
-									<m:Label text="{i18n>ContactPhone}" />
-									<m:Text text="{ContactPhone}" />
-									<m:Label text="{i18n>Email}" />
-									<m:Link text="{ContactEmail}" href="mailto:{ContactEmail}" />
-									<m:Label text="{i18n>ContactPhone}" />
-									<m:Link text="{ContactPhone}" href="tel:{ContactPhone}"  />
-									<m:Label text="{i18n>ContactStreet}" />
-									<m:Text text="{ContactStreet}" />
-									<m:Label text="{i18n>ContactCity}" />
-									<m:Text text="{ContactZip} {ContactCity}" />
-									<m:Label text="{i18n>ContactCountry}" />
-									<m:Text text="{ContactCountry}" />
-								</form:content>
-							</form:SimpleForm>
 							<m:Panel>
 								<core:HTML content="{HtmlDescription}" visible="{= ${HtmlDescription} !== null}"></core:HTML>
 								<core:HTML content="&lt;span&gt;{Description}&lt;/span&gt;" visible="{= ${HtmlDescription} === null}"/>
