@@ -21,7 +21,7 @@ public class Data {
 		projectOffer.setPublishingOrganization("GULP Information Services GmbH");
 		projectOffer.setPublishingOrganizationId("a0w3X00000UIsGXQA1");
 		projectOffer.setTitle("Senior Software Engineer Java Middleware/Backend (m/w/d)");
-		String s = "2020-10-16T10:33:00+02:00";
+		String s = "2020-10-16T08:33:00Z";
 		TemporalAccessor ta = DateTimeFormatter.ISO_INSTANT.parse(s);
 	    Instant i = Instant.from(ta);
 	    Date d = Date.from(i);
