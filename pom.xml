@@ -17,5 +17,6 @@
     <module>redsapsolutions-scraper</module>
     <module>hays-scraper</module>
     <module>topitservices-scraper</module>
+    <module>etengo-scraper</module>
   </modules>
 </project>

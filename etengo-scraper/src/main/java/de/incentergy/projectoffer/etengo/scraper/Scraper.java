@@ -1,5 +1,6 @@
 package de.incentergy.projectoffer.etengo.scraper;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
@@ -87,14 +88,18 @@ public class Scraper {
 //	}
 
 		for (JsonValue projectValue : projects.getJsonObject("response").getJsonArray("docs")) {
-			if (!(projectValue instanceof JsonObject)) {
-				continue;
-			}
-			JsonObject projectObject = (JsonObject) projectValue;
-			JsonObject projectOfferJson = etengoJsonToProjectOfferJson(projectObject);
-			log.fine(projectOfferJson.toString());
-			if (context != null) {
-				context.createProducer().send(queue, projectOfferJson.toString());
+			try {
+				if (!(projectValue instanceof JsonObject)) {
+					continue;
+				}
+				JsonObject projectObject = (JsonObject) projectValue;
+				JsonObject projectOfferJson = etengoJsonToProjectOfferJson(projectObject);
+				log.fine(projectOfferJson.toString());
+				if (context != null) {
+					context.createProducer().send(queue, projectOfferJson.toString());
+				}
+			} catch (Exception ex) {
+				log.log(Level.WARNING, "Could not process result from etengo", ex);
 			}
 		}
 	}
@@ -130,8 +135,10 @@ public class Scraper {
 
 		JsonArrayBuilder skills = Json.createArrayBuilder();
 
-		for (JsonValue skill : projectObject.getJsonArray("skills_stringM")) {
-			skills.add(Json.createObjectBuilder().add("name", skill).build());
+		if (projectObject != null && projectObject.getJsonArray("skills_stringM") != null) {
+			for (JsonValue skill : projectObject.getJsonArray("skills_stringM")) {
+				skills.add(Json.createObjectBuilder().add("name", skill).build());
+			}
 		}
 
 		JsonObject jsonObject = Json.createObjectBuilder()
