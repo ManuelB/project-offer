@@ -16,5 +16,6 @@
     <module>freelancermap-scraper</module>
     <module>redsapsolutions-scraper</module>
     <module>hays-scraper</module>
+    <module>topitservices-scraper</module>
   </modules>
 </project>
