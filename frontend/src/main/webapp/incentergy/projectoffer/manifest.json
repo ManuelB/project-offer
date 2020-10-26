@@ -356,7 +356,7 @@
 			  "padding": 5,
 			  "width": 600,
 			  "height": 200,
-			  "title": {"text": "Job offers per skill", "frame": "group"},
+			  "title": {"text": "Job offers per skill (top 30)", "frame": "group"},
 			  "style": "cell",
 			  "data": [
 			    {
@@ -386,11 +386,17 @@
 			          "ops": ["count"],
 			          "fields": [null],
 			          "as": ["__count"]
+			        },{
+			          "type": "window",
+			          "sort": {"field": "__count", "order": "descending"},
+			          "ops": ["rank"],
+			          "fields": [null],
+			          "as": ["rank"]
 			        },
-					{
-						"type": "filter",
-						"expr": "datum[\"__count\"] > 5"
-					},
+			        {
+			          "type" : "filter",
+			          "expr": "datum.rank<31"
+			        },
 					{
 					  "type": "collect",
 					  "sort": {"field": "__count"}
