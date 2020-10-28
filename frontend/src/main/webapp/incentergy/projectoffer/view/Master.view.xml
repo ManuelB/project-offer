@@ -22,7 +22,7 @@
         					descending: 'true'
 						}
 					}"
-				class="sapFDynamicPageAlignContent" width="auto" growing="true">
+				class="sapFDynamicPageAlignContent" width="auto" growing="true" autoPopinMode="true">
 				<headerToolbar>
 					<OverflowToolbar>
 						<ToolbarSpacer />
@@ -32,19 +32,19 @@
 					</OverflowToolbar>
 				</headerToolbar>
 				<columns>
-					<Column width="10%">
+					<Column width="10%" importance="Medium" autoPopinWidth="10">
 						<Text text="{i18n>OriginalPublicationDate}" />
 					</Column>
-					<Column width="50%">
+					<Column width="50%" importance="High">
 						<Text text="{i18n>Title}" />
 					</Column>
-					<Column width="10%">
+					<Column width="10%" importance="High" autoPopinWidth="18">
 						<Text text="{i18n>Location}" />
 					</Column>
-					<Column width="15%">
+					<Column width="15%" importance="Low">
 						<Text text="{i18n>AgencyOrganization}" />
 					</Column>
-					<Column width="15%">
+					<Column width="15%" importance="Low">
 						<Text text="{i18n>PublishingOrganization}" />
 					</Column>
 				</columns>
