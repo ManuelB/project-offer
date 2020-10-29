@@ -15,7 +15,7 @@ import javax.ejb.Singleton;
 import javax.ejb.Startup;
 import javax.inject.Inject;
 import javax.jms.JMSContext;
-import javax.jms.Queue;
+import javax.jms.Topic;
 import javax.json.Json;
 import javax.json.JsonObjectBuilder;
 
@@ -32,7 +32,7 @@ public class Scraper {
 	private JMSContext context;
 
 	@Resource(mappedName = "java:/jms/projectoffer/projectoffer")
-	Queue queue;
+	Topic topic;
 
 	private static Logger log = Logger.getLogger(Scraper.class.getName());
 
@@ -103,7 +103,7 @@ public class Scraper {
 					String jsonString = builder.build().toString();
 					log.fine(jsonString);
 					if (context != null) {
-						context.createProducer().send(queue, jsonString);
+						context.createProducer().send(topic, jsonString);
 					}
 				} catch (Exception e) {
 					log.log(Level.WARNING, "Could not parse project row: " + i, e);

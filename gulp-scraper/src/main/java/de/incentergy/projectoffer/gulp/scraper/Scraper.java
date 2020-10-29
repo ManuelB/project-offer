@@ -9,7 +9,7 @@ import javax.ejb.Singleton;
 import javax.ejb.Startup;
 import javax.inject.Inject;
 import javax.jms.JMSContext;
-import javax.jms.Queue;
+import javax.jms.Topic;
 import javax.json.Json;
 import javax.json.JsonArrayBuilder;
 import javax.json.JsonObject;
@@ -26,7 +26,7 @@ public class Scraper {
 	private JMSContext context;
 
 	@Resource(mappedName = "java:/jms/projectoffer/projectoffer")
-	Queue queue;
+	Topic topic;
 
 	private static Logger log = Logger.getLogger(Scraper.class.getName());
 
@@ -71,7 +71,7 @@ public class Scraper {
 			}
 			JsonObject projectObject = (JsonObject) projectValue;
 			JsonObject projectOfferJson = gulpJsonToProjectOfferJson(projectObject);
-			context.createProducer().send(queue, projectOfferJson.toString());
+			context.createProducer().send(topic, projectOfferJson.toString());
 		}
 	}
 

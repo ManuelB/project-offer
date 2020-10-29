@@ -21,10 +21,10 @@ import javax.persistence.PersistenceContext;
 import de.incentergy.projectoffer.entities.ProjectOffer;
 
 @JMSDestinationDefinitions({
-		@JMSDestinationDefinition(name = "java:/jms/projectoffer/projectoffer", interfaceName = "javax.jms.Queue", destinationName = "projectoffer") })
+		@JMSDestinationDefinition(name = "java:/jms/projectoffer/projectoffer", interfaceName = "javax.jms.Topic", destinationName = "projectoffer") })
 @MessageDriven(activationConfig = {
 		@ActivationConfigProperty(propertyName = "destinationLookup", propertyValue = "java:/jms/projectoffer/projectoffer"),
-		@ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Queue"),
+		@ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Topic"),
 		@ActivationConfigProperty(propertyName = "messageSelector", propertyValue = "") })
 public class CreateProjectOfferMessageListener implements MessageListener {
 

@@ -15,7 +15,7 @@ import javax.ejb.Singleton;
 import javax.ejb.Startup;
 import javax.inject.Inject;
 import javax.jms.JMSContext;
-import javax.jms.Queue;
+import javax.jms.Topic;
 import javax.json.Json;
 import javax.json.JsonArrayBuilder;
 import javax.json.JsonObjectBuilder;
@@ -33,7 +33,7 @@ public class Scraper {
 	private JMSContext context;
 
 	@Resource(mappedName = "java:/jms/projectoffer/projectoffer")
-	Queue queue;
+	Topic topic;
 
 	private static Logger log = Logger.getLogger(Scraper.class.getName());
 
@@ -73,8 +73,12 @@ public class Scraper {
 						builder.add("agencyOrganization", company);
 	
 						Elements created = projectRow.select(".created");
-						String dateString = created.text().strip().substring(16);
-						LocalDateTime dateTime = LocalDateTime.parse(dateString, DATE_TIME_PATTERN);
+						String strip = created.text().strip();
+						LocalDateTime dateTime = LocalDateTime.now();
+						if(strip.length() > 16) {
+							String dateString = strip.substring(16);
+							dateTime = LocalDateTime.parse(dateString, DATE_TIME_PATTERN);
+						}
 						
 						builder.add("originalPublicationDate", dateTime.toString());
 	
@@ -93,7 +97,7 @@ public class Scraper {
 						String jsonString = builder.build().toString();
 						log.fine(jsonString);
 						if (context != null) {
-							context.createProducer().send(queue, jsonString);
+							context.createProducer().send(topic, jsonString);
 						}
 					} catch (Exception e) {
 						log.log(Level.WARNING, "Could not parse project row: " + i, e);
