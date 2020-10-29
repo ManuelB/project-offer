@@ -197,7 +197,7 @@
 			        },
 			        {
 			          "type": "filter",
-			          "expr": "(isDate(datum[\"yearmonthdate_project.OriginalPublicationDate\"]) || (isValid(datum[\"yearmonthdate_project.OriginalPublicationDate\"]) && isFinite(+datum[\"yearmonthdate_project.OriginalPublicationDate\"])))"
+			          "expr": "(isDate(datum[\"yearmonthdate_project.OriginalPublicationDate\"]) || (isValid(datum[\"yearmonthdate_project.OriginalPublicationDate\"]) && isFinite(+datum[\"yearmonthdate_project.OriginalPublicationDate\"]))) && ((now()-datum[\"yearmonthdate_project.OriginalPublicationDate\"])<(1000*60*60*24*30))"
 			        }
 			      ]
 			    }
