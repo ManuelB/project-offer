@@ -18,5 +18,6 @@
     <module>hays-scraper</module>
     <module>topitservices-scraper</module>
     <module>etengo-scraper</module>
+    <module>krongaard-scraper</module>
   </modules>
 </project>
