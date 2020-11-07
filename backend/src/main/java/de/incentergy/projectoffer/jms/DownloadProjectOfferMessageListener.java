@@ -15,6 +15,7 @@ import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.ws.rs.RedirectionException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 
@@ -49,7 +50,7 @@ public class DownloadProjectOfferMessageListener implements MessageListener {
 	public void onMessage(Message message) {
 		// do not process redelivered messages
 		try {
-			if(message.getJMSRedelivered()) {
+			if (message.getJMSRedelivered()) {
 				return;
 			}
 		} catch (JMSException e1) {
@@ -73,17 +74,34 @@ public class DownloadProjectOfferMessageListener implements MessageListener {
 	}
 
 	public static void getAndPersistPage(EntityManager em, Client client, String url) {
-		if (em.find(ProjectOfferPage.class, url) == null) {
+		if (em == null || em.find(ProjectOfferPage.class, url) == null) {
 			log.log(Level.INFO, "Downloading project offer event {0}", new Object[] { url });
 			ProjectOfferPage projectOfferPage = new ProjectOfferPage();
 			projectOfferPage.setUrl(url);
-			
-			String htmlContent = client.target(url).request().get(String.class);
-			String textContent = htmlContent.replaceAll("<[^>]*>", "");
-			
+
+			String htmlContent = null;
+			String textContent = null;
+			int redirectCount = 0;
+			do {
+				try {
+					htmlContent = client.target(url).request().get(String.class);
+				} catch (RedirectionException ex) {
+					url = ex.getLocation().toString();
+					log.log(Level.INFO, "Following redirect {0}", new Object[] { url });
+					redirectCount++;
+				}
+			} while (htmlContent == null && redirectCount < 3);
+			if (htmlContent != null) {
+				textContent = htmlContent.replaceAll("<[^>]*>", "");
+			}
 			projectOfferPage.setHtmlContent(htmlContent);
 			projectOfferPage.setTextContent(textContent);
-			em.persist(projectOfferPage);
+			if (em != null) {
+				em.persist(projectOfferPage);
+			} else {
+				log.warning("em is null. In a test case this might be normal");
+			}
+
 		}
 	}
 
