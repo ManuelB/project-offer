@@ -13,7 +13,9 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
@@ -25,42 +27,43 @@ import de.incentergy.base.opensearch.Searchable;
 
 @Entity
 @Indexed
+@Table(indexes = @Index(columnList = "originalpublicationdate"))
 public class ProjectOffer implements Searchable {
-	
+
 	private static Logger log = Logger.getLogger(ProjectOffer.class.getName());
-	
+
 	@Id
 	private String id = UUID.randomUUID().toString();
-	
+
 	private String url;
 
 	@Field
 	private String publishingOrganization;
 
 	private String publishingOrganizationId;
-	
+
 	@Temporal(TemporalType.TIMESTAMP)
 	private Calendar originalPublicationDate;
-	
+
 	@Field
 	private String agencyOrganization;
-	
+
 	@Field
 	private String searchingOrganization;
 
 	@Field
 	private String title;
-	
+
 	@Field
 	private String location;
-	
-	@Column(length=65536)
+
+	@Column(length = 65536)
 	private String htmlDescription;
-	
-	@Column(length=65536)
+
+	@Column(length = 65536)
 	@Field
 	private String description;
-	
+
 	private String contactFirstname;
 	private String contactLastname;
 	private String contactPhone;
@@ -69,8 +72,7 @@ public class ProjectOffer implements Searchable {
 	private String contactZip;
 	private String contactCity;
 	private String contactCountry;
-	
-	
+
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Skill> skills = new ArrayList<>();
 
@@ -165,7 +167,7 @@ public class ProjectOffer implements Searchable {
 	public List<Skill> getSkills() {
 		return skills;
 	}
-	
+
 	public void addSkill(String name) {
 		getSkills().add(new Skill(name));
 	}
@@ -243,13 +245,11 @@ public class ProjectOffer implements Searchable {
 		Entry entry = new Entry();
 		entry.setTitle(getTitle());
 		try {
-			entry.setId(new URI("#projectoffer/ProjectOffers('"+getId()+"')/TwoColumnsMidExpanded"));
+			entry.setId(new URI("#projectoffer/ProjectOffers('" + getId() + "')/TwoColumnsMidExpanded"));
 		} catch (URISyntaxException e) {
 			log.log(Level.WARNING, "Could not generate search uri", e);
 		}
 		return entry;
 	}
-
-
 
 }

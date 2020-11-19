@@ -87,6 +87,8 @@ public class DownloadProjectOfferMessageListener implements MessageListener {
 					htmlContent = client.target(url).request().get(String.class);
 				} catch (RedirectionException ex) {
 					url = ex.getLocation().toString();
+					projectOfferPage.setUrl(url);
+
 					log.log(Level.INFO, "Following redirect {0}", new Object[] { url });
 					redirectCount++;
 				}

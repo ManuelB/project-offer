@@ -164,7 +164,7 @@
 			  "data": [
 			    {
 			      "name": "source_0",
-			      "url": "../../../project-offer-backend/Data.svc/ProjectOffers?$select=Id,OriginalPublicationDate"
+			      "url": "../../../project-offer-backend/Data.svc/ProjectOffers?$select=Id,OriginalPublicationDate&$filter=OriginalPublicationDate gt __TWO_WEEKS_AGO__"
 			    },
 			    {
 			      "name": "data_0",
@@ -361,7 +361,7 @@
 			  "data": [
 			    {
 			      "name": "source_0",
-			      "url": "../../../project-offer-backend/Data.svc/ProjectOffers?$expand=Skills&$select=Id,Skills/Name",
+			      "url": "../../../project-offer-backend/Data.svc/ProjectOffers?$expand=Skills&$select=Id,Skills/Name&$filter=OriginalPublicationDate gt __TWO_WEEKS_AGO__",
 			      "format": {"type": "json"},
 			      "transform": [
 			        {"type": "flatten", "fields": ["d.results"], "as": ["project"]},
@@ -510,7 +510,7 @@
  			  "data": [
 			    {
 			      "name": "source_0",
-			      "url": "../../../project-offer-backend/Data.svc/ProjectOffers?$select=Id,PublishingOrganization",
+			      "url": "../../../project-offer-backend/Data.svc/ProjectOffers?$select=Id,PublishingOrganization&$filter=OriginalPublicationDate gt __TWO_WEEKS_AGO__",
 			      "transform": [
 			        {"type": "flatten", "fields": ["d.results"], "as": ["project"]},
 			        {
