@@ -10,7 +10,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(indexes = @Index(columnList = "project_id"))
+@Table(indexes = @Index(columnList = "projectoffer_id"))
 public class Skill {
 	
 	@Id
