@@ -5,6 +5,7 @@ import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 
 @Entity
 public class Skill {
@@ -14,6 +15,9 @@ public class Skill {
 	
 	@Column(length=65536)
 	private String name;
+	
+	@ManyToOne()
+	private ProjectOffer projectOffer;
 	
 	public Skill() {
 		super();
@@ -37,6 +41,14 @@ public class Skill {
 
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	public ProjectOffer getProjectOffer() {
+		return projectOffer;
+	}
+
+	public void setProjectOffer(ProjectOffer projectOffer) {
+		this.projectOffer = projectOffer;
 	}
 
 }

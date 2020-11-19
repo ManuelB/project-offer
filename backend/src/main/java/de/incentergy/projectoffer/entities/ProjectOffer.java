@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.OneToMany;
@@ -73,7 +74,7 @@ public class ProjectOffer implements Searchable {
 	private String contactCity;
 	private String contactCountry;
 
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "projectOffer", orphanRemoval = true)
 	private List<Skill> skills = new ArrayList<>();
 
 	public String getId() {
