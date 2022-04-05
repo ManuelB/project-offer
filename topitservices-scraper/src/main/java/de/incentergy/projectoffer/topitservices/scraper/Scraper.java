@@ -7,6 +7,8 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -37,40 +39,25 @@ public class Scraper {
 	private static Logger log = Logger.getLogger(Scraper.class.getName());
 
 	SimpleDateFormat sdtF = new SimpleDateFormat("dd.MM.yyyy", Locale.GERMANY);
+	private static final Pattern PROJECT_ID_PATTERN = Pattern.compile(".*(\\d{3}-\\d{4,6}).*");
 
 	@PostConstruct
 	@Schedule(hour = "*")
 	public void scrap() {
 		String baseUrl = "https://www.top-itservices.com";
-		String url = baseUrl + "/annoncen/";
+		String url = baseUrl + "/annoncen/suchbegriff/Freiberuflich/ort/umkreis/20";
 		Document doc;
 		try {
-			doc = Jsoup.connect(url).data("tx_topitannoncen_annoncenlisting[__referrer][@extension]", "Topitannoncen")
-					.data("tx_topitannoncen_annoncenlisting[__referrer][@vendor]", "Topit")
-					.data("tx_topitannoncen_annoncenlisting[__referrer][@controller]", "Annonce")
-					.data("tx_topitannoncen_annoncenlisting[__referrer][@action]", "list")
-					.data("tx_topitannoncen_annoncenlisting[__referrer][arguments]",
-							"YTo0OntzOjY6ImFjdGlvbiI7czo0OiJsaXN0IjtzOjEwOiJjb250cm9sbGVyIjtzOjc6IkFubm9uY2UiO3M6MTA6InNlYXJjaFdvcmQiO3M6MDoiIjtzOjk6InNlYXJjaExvYyI7czowOiIiO30=f49e65e34182ec24573ff69c66b9240209f9d848")
-					.data("tx_topitannoncen_annoncenlisting[__referrer][@request]",
-							"a:4:{s:10:\"@extension\";s:13:\"Topitannoncen\";s:11:\"@controller\";s:7:\"Annonce\";s:7:\"@action\";s:4:\"list\";s:7:\"@vendor\";s:5:\"Topit\";}d9a3add027efc8636d05d77114268bd23dfc01c8")
-					.data("tx_topitannoncen_annoncenlisting[__trustedProperties]",
-							"a:7:{s:10:\"searchWord\";i:1;s:9:\"searchLoc\";i:1;s:14:\"annonceUmkreis\";i:1;s:11:\"annonceType\";i:1;s:11:\"annonceLogo\";i:1;s:7:\"filter1\";i:1;s:12:\"itemsperpage\";i:1;}86764384a2e4c2b3e456044fbd1b123dd088af0d")
-					.data("tx_topitannoncen_annoncenlisting[searchWord]", "")
-					.data("tx_topitannoncen_annoncenlisting[searchLoc]", "")
-					.data("tx_topitannoncen_annoncenlisting[annonceUmkreis]", "99")
-					.data("tx_topitannoncen_annoncenlisting[annonceType]", "Freiberuflich")
-					.data("tx_topitannoncen_annoncenlisting[annonceLogo]", "99")
-					.data("tx_topitannoncen_annoncenlisting[filter1]", "99")
-					.data("tx_topitannoncen_annoncenlisting[itemsperpage]", "100").post();
+			doc = Jsoup.connect(url).get();
 			log.fine(doc.title());
-			Elements projectRows = doc.select(".row.annoncenTitle");
+			Elements projectRows = doc.select("table.table tr");
 			int i = 0;
 			for (Element projectRow : projectRows) {
 				try {
 					JsonObjectBuilder builder = Json.createObjectBuilder();
 					builder.add("publishingOrganization", "top itservices AG");
 
-					Element titleA = projectRow.select(".annonceLinkAction").first();
+					Element titleA = projectRow.select(".forum-title").first();
 					if (titleA == null) {
 						log.warning("Did not find a title for topitservices posting project " + i);
 						continue;
@@ -80,18 +67,20 @@ public class Scraper {
 					String projectUrl = titleA.attr("href");
 					builder.add("url", baseUrl + projectUrl);
 
-					String id = projectRow.attr("id");
+					Matcher m = PROJECT_ID_PATTERN.matcher(projectUrl);
+					m.matches();
+					String id = m.group(1);
 
 					builder.add("id", "topitservices-" + id);
 					builder.add("publishingOrganizationId", id);
 
-					Element location = projectRow.select("div").get(4).selectFirst(".hidden-xs-down");
+					Element location = projectRow.select("td").get(2);
 
 					builder.add("location", location.text().trim());
 
 					builder.add("agencyOrganization", "top itservices AG");
 
-					Element publishingDate = projectRow.select("div").get(8);
+					Element publishingDate = projectRow.select("td").get(3);
 
 					Date germanDate = sdtF.parse(publishingDate.text().trim());
 
