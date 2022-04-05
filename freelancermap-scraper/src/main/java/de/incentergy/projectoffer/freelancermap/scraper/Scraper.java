@@ -6,6 +6,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -37,8 +39,10 @@ public class Scraper {
 
 	private static Logger log = Logger.getLogger(Scraper.class.getName());
 
-	private final static DateTimeFormatter DATE_TIME_PATTERN = DateTimeFormatter.ofPattern("dd.MM.yyyy 'um' HH:mm");
+	private final static DateTimeFormatter DATE_TIME_PATTERN = DateTimeFormatter.ofPattern("dd.MM.yyyy '/' HH:mm");
 
+	private static final Pattern PROJECT_ID_PATTERN = Pattern.compile(".*(\\d{7,10}).*");
+	
 	@PostConstruct
 	@Schedule(hour = "*")
 	public void scrap() {
@@ -50,29 +54,32 @@ public class Scraper {
 			try {
 				doc = Jsoup.connect(url).get();
 				log.fine(doc.title());
-				Elements projectRows = doc.select(".project-row");
+				Elements projectRows = doc.select(".project-container");
 				int i = 0;
 				for (Element projectRow : projectRows) {
 					try {
 						JsonObjectBuilder builder = Json.createObjectBuilder();
 						builder.add("publishingOrganization", "freelancermap GmbH");
 	
-						Element titleA = projectRow.select("h3.title a").first();
+						Element titleA = projectRow.select("h3.body a.project-title").first();
 						String title = titleA.text();
 						builder.add("title", title);
-						builder.add("id", "freelancermap-" + projectRow.attr("data-id"));
-						builder.add("publishingOrganizationId", projectRow.attr("data-id"));
 						String projectUrl = titleA.attr("href");
 						builder.add("url", baseUrl+projectUrl);
+						Matcher m = PROJECT_ID_PATTERN.matcher(projectUrl);
+						m.matches();
+						String id = m.group(1);
+						builder.add("id", "freelancermap-" + id);
+						builder.add("publishingOrganizationId", id);
 	
-						Elements detailsCountry = projectRow.select(".details .country a");
+						Elements detailsCountry = projectRow.select(".project-location .city");
 	
 						builder.add("location", detailsCountry.text().trim());
 	
 						String company = projectRow.select(".company a").text();
 						builder.add("agencyOrganization", company);
 	
-						Elements created = projectRow.select(".created");
+						Elements created = projectRow.select(".created-date");
 						String strip = created.text().strip();
 						LocalDateTime dateTime = LocalDateTime.now();
 						if(strip.length() > 16) {
@@ -85,7 +92,7 @@ public class Scraper {
 						String description = projectRow.select(".description").text();
 						builder.add("description", description);
 	
-						List<String> skills = projectRow.select(".categories span a").stream().map(e -> e.text())
+						List<String> skills = projectRow.select(".keywords-container a").stream().map(e -> e.text())
 								.collect(Collectors.toList());
 	
 						JsonArrayBuilder skillArray = Json.createArrayBuilder();
@@ -108,7 +115,7 @@ public class Scraper {
 				log.log(Level.WARNING, "Could not access url", e);
 			}
 			page++;
-			url = "https://www.freelancermap.de/?module=projekt&func=suchergebnisse&pq_sorttype=1&redirect=1&pagenr="+page;
+			url = "https://www.freelancermap.de/projektboerse.html?contractTypes=&endcustomer=20&created=&excludeDachProjects=0&partner=&poster=&lastRun=&currentPlatform=1&query=&queryParts=&continents=&countries%5B0%5D=1&states=&location=&radius=&city=&categories=&subCategories=&sort=1&pagenr="+page;
 		} while(page < 5);
 	}
 
